@@ -77,7 +77,7 @@ static int cmd_info(char *args) {
         return 0;
     }
     if (s == 'w') {
-        printf("TODO...");
+        printf("TODO...\n");
         return 0;
     }
     else {
