@@ -53,6 +53,39 @@ static int cmd_si(char *args) {
     return 0;
 }
 
+static int cmd_info(char *args) {
+    char s;
+    if (args == NULL) {
+        printf("args error in cmd_info\n");
+        return 0;
+    }
+
+    int nRet = sscanf(args, "%c", &s);
+    if (nRet <= 0) {
+        printf("args error in cmd_info\n");
+        return 0;
+    }
+    if (s == 'r') {
+        int i;
+        for (i = 0; i < 8; i++) 
+            printf("%s 0x%x\n", regsl[i], reg_l(i));        
+        printf("eip 0x%x\n", cpu.eip);
+        for (i = 0; i < 8; i++)
+            printf("%s 0x%x\n", regsw[i], reg_w(i));
+        for (i = 0; i < 8; i++) 
+            printf("%s 0x%x\n", regsw[i], reg_w(i));
+        return 0;
+    }
+    if (s == 'w') {
+        printf("TODO...");
+        return 0;
+    }
+    else {
+        printf("args error in cmd_info\n");
+        return 0;
+    }
+}
+
 static struct {
   char *name;
   char *description;
@@ -62,11 +95,11 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "args: [N]; execute [N] instructions step by step", cmd_si },
- /* { "info", "args: r/w; print information about registers or watchpoint", cmd_info },
-  { "x", "x [N] [EXPR]; scan the memory", cmd_x },
-  { "p", "expr", cmd_p },
-  { "w", "set the watchpoint", cmd_w },
-  { "d", "delete the watchpoint", cmd_d },*/
+  { "info", "args: r/w; print information about registers or watchpoint", cmd_info },
+  /* { "x", "x [N] [EXPR]; scan the memory", cmd_x }, */
+  /* { "p", "expr", cmd_p }, */
+  /* { "w", "set the watchpoint", cmd_w }, */
+  /* { "d", "delete the watchpoint", cmd_d }, */
   /* TODO: Add more commands */
 };
 
