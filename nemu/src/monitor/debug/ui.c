@@ -38,6 +38,21 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+static int cmd_si(char *args) {
+    uint64_t N = 0;
+    if (args == NULL) 
+        N = 1;
+    else {
+        int nRet = sscanf(args, "%llu", &N);
+        if (nRet <= 0) {
+            printf("args error in cmd_si\n");
+            return 0;
+        }
+    }
+    cpu_exec(N);
+    return 0;
+}
+
 static struct {
   char *name;
   char *description;
@@ -46,9 +61,13 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
+  { "si", "args: [N]; execute [N] instructions step by step", cmd_si },
+ /* { "info", "args: r/w; print information about registers or watchpoint", cmd_info },
+  { "x", "x [N] [EXPR]; scan the memory", cmd_x },
+  { "p", "expr", cmd_p },
+  { "w", "set the watchpoint", cmd_w },
+  { "d", "delete the watchpoint", cmd_d },*/
   /* TODO: Add more commands */
-
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
