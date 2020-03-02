@@ -73,7 +73,7 @@ static int cmd_info(char *args) {
         for (i = 0; i < 8; i++)
             printf("%s 0x%x\n", regsw[i], reg_w(i));
         for (i = 0; i < 8; i++) 
-            printf("%s 0x%x\n", regsw[i], reg_w(i));
+            printf("%s 0x%x\n", regsb[i], reg_b(i));
         return 0;
     }
     if (s == 'w') {
