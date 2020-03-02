@@ -86,6 +86,26 @@ static int cmd_info(char *args) {
     }
 }
 
+static int cmd_x(char *args) {
+    int nLen = 0;
+    vaddr_t addr;
+    int nRet = sscanf(args, "%d 0x%x", &nLen, &addr);
+    if (nRet <= 0) {
+        printf("args error in cmd_x\n");
+        return 0;
+    }
+    printf("Memory: ");
+    int i;
+    for (i = 0; i < nLen; i++) {
+        if (i % 4 == 0)
+            printf("\n0x%x:  0x%02x", addr + i, vaddr_read(addr + i, 1));
+        else
+            printf("0x%02x", vaddr_read(addr + i, 1));
+    }
+    printf("\n");
+    return 0;
+}
+
 static struct {
   char *name;
   char *description;
@@ -96,7 +116,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "args: [N]; execute [N] instructions step by step", cmd_si },
   { "info", "args: r/w; print information about registers or watchpoint", cmd_info },
-  /* { "x", "x [N] [EXPR]; scan the memory", cmd_x }, */
+  { "x", "x [N] [EXPR]; scan the memory", cmd_x },
   /* { "p", "expr", cmd_p }, */
   /* { "w", "set the watchpoint", cmd_w }, */
   /* { "d", "delete the watchpoint", cmd_d }, */
