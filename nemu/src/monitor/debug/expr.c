@@ -108,12 +108,16 @@ static bool make_token(char *e) {
             return false;
         }
     }
-
+    int j;
+    printf("token expression:\n");
+    for (j = 0; j < nr_token; j++) {
+        printf("type: %d, str: %s\n", tokens[j].type, tokens[j].str);
+    }
     return true;
 }
 
 uint32_t expr(char *e, bool *success) {
-    if (make_token(e) == false) {
+    if (!make_token(e)) {
         *success = false;
         return 0;
     }
