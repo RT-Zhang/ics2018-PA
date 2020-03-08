@@ -107,7 +107,7 @@ static int cmd_x(char *args) {
 }
 
 static int cmd_p(char *args) {
-    bool success = true;
+    bool success;
     int res = expr(args, &success);
     if (success == false)
         printf("error in expr()\n");
