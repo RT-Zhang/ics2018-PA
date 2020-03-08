@@ -111,7 +111,6 @@ static int cmd_p(char *args) {
     int res = expr(args, &success);
     if (success == false) {
         printf("error in expr()\n");
-        printf("zenme jinlai de?\n");
     } else
         printf("value of expr: %d\n", res);
     return 0;
