@@ -95,7 +95,8 @@ static bool make_token(char *e) {
                         *(tokens[nr_token].str + substr_len) = '\0';
                         break;
                     }
-                    printf("Success record: nr_token=%d, type=%d, str=%s\n", nr_token, tokens[nr_token].type, tokens[nr_token].str);
+                    printf("Success record: nr_token=%d, type=%d, str=%s\n",
+                           nr_token, tokens[nr_token].type, tokens[nr_token].str);
                     nr_token += 1;  // update nr_token
                     break;  // break for loop, for we've found a match
                 }
