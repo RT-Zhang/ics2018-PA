@@ -9,8 +9,10 @@
 
 enum {
     TK_NOTYPE = 256,
-    TK_NUMBER
-        /* TODO: Add more token types */
+    TK_NUMBER, TK_HEX, TK_REG,
+    TK_EQ, TK_NEQ, TK_AND, TK_OR,
+    TK_NEGATIVE, TK_DEREF
+    /* TODO: Add more token types */
 };
 
 static struct rule {
@@ -21,15 +23,23 @@ static struct rule {
      * Pay attention to the precedence level of different rules.
      */
     {" +", TK_NOTYPE},    // one or more spaces, + is not plus
+    {"0x[1-9A-Fa-f][0-9A-Fa-f]*", TK_HEX},
+    {"\\$(eax|ecx|edx|ebx|esp|ebp|esi|edi|eip|ax|cx|dx|bx|sp|bp|si|di|al|cl|dl|bl|ah|ch|dh|bh), TK_REG"},
     {"0|[1-9][0-9]*", TK_NUMBER},
+   
+    {"==", TK_EQ},
+    {"!=", TK_NEQ},
+
+    {"&&", TK_AND},
+    {"\\|\\|", TK_OR},
+    {"!", '!'},
+    
     {"\\+", '+'},         // plus
     {"-", '-'},           // minus
     {"\\*", '*'},         // mul
     {"\\/", '/'},         // divide
     {"\\(", '('},         // left parenthesis
     {"\\)", ')'},         // right parenthesis
-
-    // {"==", TK_EQ}         // equal
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -91,12 +101,12 @@ static bool make_token(char *e) {
                     tokens[nr_token].type = rules[i].token_type;
                     switch (rules[i].token_type) {
                     case TK_NUMBER:
+                    case TK_HEX:
+                    case TK_REG:
                         strncpy(tokens[nr_token].str, substr_start, substr_len);
                         *(tokens[nr_token].str + substr_len) = '\0';
                         break;
                     }
-                    printf("Success record: nr_token=%d, type=%d, str=%s\n",
-                           nr_token, tokens[nr_token].type, tokens[nr_token].str);
                     nr_token += 1;  // update nr_token
                     break;  // break for loop, for we've found a match
                 }
@@ -170,7 +180,6 @@ int eval(int p, int q) {
         return eval(p + 1, q - 1);
     } else {
         int op = findDominantOp(p, q);
-        printf("Dominant op index=%d\n", op);
         int val1 = eval(p, op - 1);
         int val2 = eval(op + 1, q);
         switch(tokens[op].type) {
@@ -194,7 +203,6 @@ uint32_t expr(char *e, bool *success) {
         *success = false;
         return 0;
     }
-
     *success = true;
     return eval(0, nr_token - 1);
 }
