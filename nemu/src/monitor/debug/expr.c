@@ -176,7 +176,7 @@ int eval(int p, int q) {
         return eval(p + 1, q - 1);
     } else {
         int op = findDominantOp(p, q);
-        printf("Dominant OP=%c\n", tokens[op].type);
+        printf("Dominant OP='%c'\n", tokens[op].type);
         int val1 = eval(p, op - 1);
         int val2 = eval(op + 1, q);
         switch(tokens[op].type) {
