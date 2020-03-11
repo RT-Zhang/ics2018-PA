@@ -189,7 +189,7 @@ int eval(int p, int q) {
         case '/':
             return val1 / val2;
         default:
-            printf("illegal op:%c", op);
+            printf("illegal op:%d", op);
             assert(0);
         }
     }
