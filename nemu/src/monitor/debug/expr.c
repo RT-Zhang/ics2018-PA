@@ -163,7 +163,7 @@ int findDominantOp(int p, int q) {
 
 int eval(int p, int q) {
     if (p > q) {
-        printf("error! p > q in eval\n");
+        printf("error! p=%d > q=%d in eval\n", p, q);
         assert(0);
     } else if (p == q) {
         return atoi(tokens[p].str);
