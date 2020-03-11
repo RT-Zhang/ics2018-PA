@@ -114,6 +114,7 @@ static bool make_token(char *e) {
 bool check_parentheses(int p, int q) {
     if (p >= q) {
         printf("error: p>=q in check_parentheses\n");
+        assert(0);
         return false;
     }
     if (tokens[p].type != '(' || tokens[q].type != ')')
@@ -126,14 +127,18 @@ bool check_parentheses(int p, int q) {
         if (tokens[curr].type == ')') {
             if (count != 0)
                 count--;
-            else
+            else {
+                assert(0);
                 return false;  // exists unmatched right
+            }
         }
     }
     if (count == 0)
         return true;
-    else
+    else {
+        assert(0);
         return false;  // exists unmatched left
+    }
 }
 
 int findDominantOp(int p, int q) {
@@ -195,6 +200,5 @@ uint32_t expr(char *e, bool *success) {
     }
 
     *success = true;
-    printf("DEBUG: p=%d, q=%d", 0, nr_token - 1);
     return eval(0, nr_token - 1);
 }
