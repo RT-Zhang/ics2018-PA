@@ -145,7 +145,7 @@ int findDominantOp(int p, int q) {
     int pos[2] = {-1, -1};  // rightmost +-, rightmost */
     int level = 0;
 
-    for (int i = 0; i < nr_token; i++) {
+    for (int i = p; i < q; i++) {
         if ((tokens[i].type != '+') && (tokens[i].type != '-')
             && (tokens[i].type != '*') && (tokens[i].type != '/'))
             continue;
