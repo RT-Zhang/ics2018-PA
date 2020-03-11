@@ -11,7 +11,7 @@ enum {
     TK_NUMBER, TK_HEX, TK_REG,
     TK_EQ, TK_NEQ, TK_AND, TK_OR,
     TK_NEGATIVE, TK_DEREF
-    /* TODO: Add more token types */
+        /* TODO: Add more token types */
 };
 
 static struct rule {
@@ -25,14 +25,14 @@ static struct rule {
     {"0x[1-9A-Fa-f][0-9A-Fa-f]*", TK_HEX},
     {"\\$(eax|ecx|edx|ebx|esp|ebp|esi|edi|eip|ax|cx|dx|bx|sp|bp|si|di|al|cl|dl|bl|ah|ch|dh|bh)", TK_REG},
     {"0|[1-9][0-9]*", TK_NUMBER},
-   
+
     {"==", TK_EQ},
     {"!=", TK_NEQ},
 
     {"&&", TK_AND},
     {"\\|\\|", TK_OR},
     {"!", '!'},
-    
+
     {"\\+", '+'},         // plus
     {"-", '-'},           // minus
     {"\\*", '*'},         // mul
@@ -192,34 +192,37 @@ int eval(int p, int q) {
     if (p > q) {
         printf("error! p=%d > q=%d in eval\n", p, q);
         assert(0);
-    } else if (p == q) {
+    }
+    else if (p == q) {
         int num;
         switch (tokens[p].type) {
-            case TK_NUMBER:
-                sscanf(tokens[p].str, "%d", &num);
-                return num;
-            case TK_HEX:
-                sscanf(tokens[p].str, "%x", &num);
-                return num;
-            case TK_REG:
-                for (int i = 0; i < 8; i++) {
-                    if (strcmp(tokens[p].str, regsl[i]) == 0)
-                        return reg_l(i);
-                    if (strcmp(tokens[p].str, regsw[i]) == 0)
-                        return reg_w(i);
-                    if (strcmp(tokens[p].str, regsb[i]) == 0)
-                        return reg_b(i);
-                }
-                if (strcmp(tokens[p].str, "eip") == 0)
-                    return cpu.eip;
-                else {
-                    printf("error in TK_REG in eval()\n");
-                    assert(0);
-                }
+        case TK_NUMBER:
+            sscanf(tokens[p].str, "%d", &num);
+            return num;
+        case TK_HEX:
+            sscanf(tokens[p].str, "%x", &num);
+            return num;
+        case TK_REG:
+            for (int i = 0; i < 8; i++) {
+                if (strcmp(tokens[p].str, regsl[i]) == 0)
+                    return reg_l(i);
+                if (strcmp(tokens[p].str, regsw[i]) == 0)
+                    return reg_w(i);
+                if (strcmp(tokens[p].str, regsb[i]) == 0)
+                    return reg_b(i);
+            }
+            if (strcmp(tokens[p].str, "eip") == 0)
+                return cpu.eip;
+            else {
+                printf("error in TK_REG in eval()\n");
+                assert(0);
+            }
         }  // switch
-    } else if (check_parentheses(p, q) == true) {
+    }
+    else if (check_parentheses(p, q) == true) {
         return eval(p + 1, q - 1);
-    } else {
+    }
+    else {
         int op = findDominantOp(p, q);
         vaddr_t addr;
         int result;
@@ -249,10 +252,10 @@ int eval(int p, int q) {
         case TK_AND: return val1 && val2;
         case TK_OR: return val1 || val2;
         default:
-            printf("illegal op:%d", op);
-            assert(0);
+                    printf("illegal op:%d", op);
+                    assert(0);
         }  // switch
-    }
+    }  // else
     printf("p=%d, q=%d\n", p, q);
     assert(0);
 }
@@ -262,14 +265,14 @@ uint32_t expr(char *e, bool *success) {
         *success = false;
         return 0;
     }
-    for (int i = 0; i < nr_token; i++) {
+    for (int i = 0; i < 0; i++) {
         int typeBefore = tokens[i - 1].type;
         if (i == 0 || (typeBefore != TK_NUMBER && typeBefore != ')'
-                     && typeBefore != TK_HEX && typeBefore != TK_REG)) {
+                       && typeBefore != TK_HEX && typeBefore != TK_REG)) {
             if (tokens[i].type == '*')
                 tokens[i].type = TK_DEREF;
             if (tokens[i].type == '-');
-                tokens[i].type = TK_NEGATIVE;
+            tokens[i].type = TK_NEGATIVE;
         }
     }
     *success = true;
