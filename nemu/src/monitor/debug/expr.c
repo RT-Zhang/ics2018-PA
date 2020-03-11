@@ -154,9 +154,9 @@ int findDominantOp(int p, int q) {
         if (tokens[i].type == ')')
             level--;
         if (level == 0) {
-            if ((tokens[i].type == '+') && (tokens[i].type == '-'))
+            if ((tokens[i].type == '+') || (tokens[i].type == '-'))
                 pos[0] = i;
-            if ((tokens[i].type == '*') && (tokens[i].type == '/'))
+            if ((tokens[i].type == '*') || (tokens[i].type == '/'))
                 pos[1] = i;
         }
     }
@@ -176,7 +176,7 @@ int eval(int p, int q) {
         return eval(p + 1, q - 1);
     } else {
         int op = findDominantOp(p, q);
-        printf("OP=%d", op);
+        printf("OP=%d\n", op);
         int val1 = eval(p, op - 1);
         int val2 = eval(op + 1, q);
         switch(op) {
