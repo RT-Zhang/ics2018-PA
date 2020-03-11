@@ -5,7 +5,6 @@
  */
 #include <sys/types.h>
 #include <regex.h>
-#include <stdlib.h>
 
 enum {
     TK_NOTYPE = 256,
@@ -149,25 +148,44 @@ bool check_parentheses(int p, int q) {
 }
 
 int findDominantOp(int p, int q) {
-    int pos[2] = {-1, -1};  // rightmost +-, rightmost */
+    int pos[5] = {-1, -1, -1, -1, -1};  // rightmost +-, rightmost */
     int level = 0;
 
-    for (int i = p; i < q; i++) {
+    for (int i = p; i <= q; i++) {
         if (tokens[i].type == '(')
             level++;
         if (tokens[i].type == ')')
             level--;
         if (level == 0) {
-            if ((tokens[i].type == '+') || (tokens[i].type == '-'))
-                pos[0] = i;
-            if ((tokens[i].type == '*') || (tokens[i].type == '/'))
-                pos[1] = i;
-        }
+            switch(tokens[i].type) {
+            case TK_NEGATIVE:
+            case TK_DEREF:
+            case '!':
+                pos[4] = i; break;
+            case '/':
+            case '*':
+                pos[3] = i; break;
+            case '+':
+            case '-':
+                pos[2] = i; break;
+            case TK_EQ:
+            case TK_NEQ:
+                pos[1] = i; break;
+            case TK_AND:
+            case TK_OR:
+                pos[0] = i; break;
+            }  // switch
+        }  // level == 0
+    }  // for
+    for (int i = 0; i < 5; i++) {
+        if (pos[i] != -1)
+            return pos[i];
     }
-    if (pos[0] != -1)
-        return pos[0];
-    else 
-        return pos[1];
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", pos[i]);
+    }
+    printf("error in findDominantOp: p=%d, q=%d", p, q);
+    assert(0);
 }
 
 int eval(int p, int q) {
@@ -175,33 +193,83 @@ int eval(int p, int q) {
         printf("error! p=%d > q=%d in eval\n", p, q);
         assert(0);
     } else if (p == q) {
-        return atoi(tokens[p].str);
+        int num;
+        switch (tokens[p].type) {
+            case TK_NUMBER:
+                sscanf(tokens[p].str, "%d", &num);
+                return num;
+            case TK_HEX:
+                sscanf(tokens[p].str, "%x", &num);
+                return num;
+            case TK_REG:
+                for (int i = 0; i < 8; i++) {
+                    if (strcmp(tokens[p].str, regsl[i]) == 0)
+                        return reg_l(i);
+                    if (strcmp(tokens[p].str, regsw[i]) == 0)
+                        return reg_w(i);
+                    if (strcmp(tokens[p].str, regsb[i]) == 0)
+                        return reg_b(i);
+                }
+                if (strcmp(tokens[p].str, "eip") == 0)
+                    return cpu.eip;
+                else {
+                    printf("error in TK_REG in eval()\n");
+                    assert(0);
+                }
+        }  // switch
     } else if (check_parentheses(p, q) == true) {
         return eval(p + 1, q - 1);
     } else {
         int op = findDominantOp(p, q);
+        vaddr_t addr;
+        int result;
+        switch (tokens[op].type) {
+        case TK_NEGATIVE:
+            return -eval(p + 1, q);
+        case TK_DEREF:
+            addr = eval(p + 1, q);
+            result = vaddr_read(addr, 4);
+            printf("addr=%u(0x%x)---->value=%d(0x%08x)\n", addr, addr, result, result);
+            return result;
+        case '!':
+            if (eval(p + 1, q) != 0)
+                return 0;
+            else 
+                return 1;
+        }
         int val1 = eval(p, op - 1);
         int val2 = eval(op + 1, q);
         switch(tokens[op].type) {
-        case '+':
-            return val1 + val2;
-        case '-':
-            return val1 - val2;
-        case '*':
-            return val1 * val2;
-        case '/':
-            return val1 / val2;
+        case '+': return val1 + val2;
+        case '-': return val1 - val2;
+        case '*': return val1 * val2;
+        case '/': return val1 / val2;
+        case TK_EQ: return val1 == val2;
+        case TK_NEQ: return val1 != val2;
+        case TK_AND: return val1 && val2;
+        case TK_OR: return val1 || val2;
         default:
             printf("illegal op:%d", op);
             assert(0);
-        }
+        }  // switch
     }
+    assert(0);
 }
 
 uint32_t expr(char *e, bool *success) {
     if (!make_token(e)) {
         *success = false;
         return 0;
+    }
+    for (int i = 0; i < nr_token; i++) {
+        int typeBefore = tokens[i - 1].type;
+        if (i == 0 || (typeBefore != TK_NUMBER && typeBefore != ')'
+                     && typeBefore != TK_HEX && typeBefore != TK_REG)) {
+            if (tokens[i].type == '*')
+                tokens[i].type = TK_DEREF;
+            if (tokens[i].type == '-');
+                tokens[i].type = TK_NEGATIVE;
+        }
     }
     *success = true;
     return eval(0, nr_token - 1);
