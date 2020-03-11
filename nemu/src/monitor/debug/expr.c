@@ -115,22 +115,19 @@ bool check_parentheses(int p, int q) {
     if (p >= q) {
         printf("error: p>=q in check_parentheses\n");
         assert(0);
-        return false;
     }
     if (tokens[p].type != '(' || tokens[q].type != ')')
         return false;
 
     int count = 0;  // number of unmatched left parentheses
-    for (int curr = p + 1; curr < q; curr++) {
+    for (int curr = p + 1; curr <= q - 1; curr++) {
         if (tokens[curr].type == '(')
             count++;
         if (tokens[curr].type == ')') {
             if (count != 0)
                 count--;
-            else {
-                assert(0);
+            else
                 return false;  // exists unmatched right
-            }
         }
     }
     if (count == 0)
