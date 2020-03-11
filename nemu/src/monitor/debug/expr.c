@@ -195,5 +195,6 @@ uint32_t expr(char *e, bool *success) {
     }
 
     *success = true;
+    printf("DEBUG: p=%d, q=%d", 0, nr_token - 1);
     return eval(0, nr_token - 1);
 }
