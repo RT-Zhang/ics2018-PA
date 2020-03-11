@@ -253,6 +253,7 @@ int eval(int p, int q) {
             assert(0);
         }  // switch
     }
+    printf("p=%d, q=%d\n", p, q);
     assert(0);
 }
 
