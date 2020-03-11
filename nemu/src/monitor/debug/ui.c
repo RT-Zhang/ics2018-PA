@@ -104,7 +104,7 @@ static int cmd_x(char *args) {
         return 0;
     }
 
-    printf("Memory: ");
+    printf("Memory from %d(0x%x): ", addr, addr);
     int i;
     for (i = 0; i < nLen; i++) {
         if (i % 4 == 0)
