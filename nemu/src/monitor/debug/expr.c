@@ -267,16 +267,20 @@ uint32_t expr(char *e, bool *success) {
         *success = false;
         return 0;
     }
-    for (int i = 0; i < nr_token; i++) {
-        int typeBefore = tokens[i - 1].type;
-        if (i == 0 || (typeBefore != TK_NUMBER && typeBefore != ')'
-                       && typeBefore != TK_HEX && typeBefore != TK_REG)) {
-            if (tokens[i].type == '*')
-                tokens[i].type = TK_DEREF;
-            if (tokens[i].type == '-')
+    if (tokens[0].type == '-')
+        tokens[0].type = TK_NEGATIVE;
+    if (tokens[0].type == '*')
+        tokens[0].type = TK_DEREF;
+    for (int i = 1; i < nr_token; i++) {
+        if (tokens[i].type == '-') {
+            if (tokens[i - 1].type != TK_NUMBER && tokens[i - 1].type != ')')
                 tokens[i].type = TK_NEGATIVE;
         }
-    }
+        if (tokens[i].type == '*') {
+            if (tokens[i - 1].type != TK_NUMBER && tokens[i - 1].type != ')')
+                tokens[i].type = TK_DEREF;
+        }
+    }//for
     *success = true;
     return eval(0, nr_token - 1);
 }
