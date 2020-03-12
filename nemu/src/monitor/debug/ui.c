@@ -77,7 +77,7 @@ static int cmd_info(char *args) {
         return 0;
     }
     if (s == 'w') {
-        printf("TODO...\n");
+        print_wp();
         return 0;
     }
     else {
@@ -126,6 +126,27 @@ static int cmd_p(char *args) {
     return 0;
 }
 
+static int cmd_w(char *args) {
+    new_wp(args);
+    return 0;
+}
+
+static int cmd_d(char *args) {
+    int num;
+    int nRet = sscanf(args, "%d", &num);
+    if (nRet <= 0) {
+        printf("args error in cmd_d\n");
+        return 0;
+    }
+
+    int r = free_wp(num);
+    if (r == false)
+        printf("error: no watchpoint %d\n", num);
+    else
+        printf("watchpoint %d successfully deleted", num);
+    return 0;
+}
+
 static struct {
   char *name;
   char *description;
@@ -138,8 +159,8 @@ static struct {
   { "info", "args: r/w; print information about registers or watchpoint", cmd_info },
   { "x", "x [N] [EXPR]; scan the memory", cmd_x },
   { "p", "expr", cmd_p },
-  /* { "w", "set the watchpoint", cmd_w }, */
-  /* { "d", "delete the watchpoint", cmd_d }, */
+  { "w", "set the watchpoint", cmd_w },
+  { "d", "delete the watchpoint", cmd_d },
   /* TODO: Add more commands */
 };
 
