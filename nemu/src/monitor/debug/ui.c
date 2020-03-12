@@ -143,7 +143,7 @@ static int cmd_d(char *args) {
     if (r == false)
         printf("error: no watchpoint %d\n", num);
     else
-        printf("watchpoint %d successfully deleted", num);
+        printf("watchpoint %d successfully deleted\n", num);
     return 0;
 }
 
