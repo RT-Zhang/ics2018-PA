@@ -165,6 +165,8 @@ void difftest_step(uint32_t eip) {
       diff = true;
   if (r.edi != cpu.edi)
       diff = true;
+  if (r.eip != cpu.eip)
+      diff = true;
   if (diff) {
     //nemu_state = NEMU_END;
     Log("qemu.eax=0x%x, nemu.eax=0x%x", r.eax, cpu.eax);
