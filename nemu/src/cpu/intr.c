@@ -11,10 +11,11 @@ void raise_intr(uint8_t NO, vaddr_t ret_addr) {
   rtl_li(&t0, t1);
   rtl_push(&t0);
   rtl_push(&cpu.cs);
-  rtl_push(&ret_addr);
+  rtl_li(&t0, ret_addr);
+  rtl_push(&t0);
 
-  uint32_t idt_addr = cpu.idtr.base + NO * 8;
-  uint32_t lx_high = vaddr_read(idt_addr + 4, 4);
+  vaddr_t idt_addr = cpu.idtr.base + NO * sizeof(GateDesc);
+  uint32_t lx_high = vaddr_read(idt_addr + sizeof(GateDesc) - 2, 2);
   uint32_t lx_low = vaddr_read(idt_addr, 2);
   uint32_t target_addr = (lx_high & 0xffff0000) | (lx_low & 0xffff);
  /* memcpy(&t1, &cpu.eflags, sizeof(cpu.eflags));
