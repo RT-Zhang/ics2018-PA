@@ -7,7 +7,7 @@ void raise_intr(uint8_t NO, vaddr_t ret_addr) {
    */
 
   //TODO();
-  memcpy(&t1, &cpu.eflags, sizeof(cpu.eflags));
+/*  memcpy(&t1, &cpu.eflags, sizeof(cpu.eflags));
   rtl_li(&t0, t1);
   rtl_push(&t0);
   rtl_push(&cpu.cs);
@@ -17,8 +17,8 @@ void raise_intr(uint8_t NO, vaddr_t ret_addr) {
   vaddr_t idt_addr = cpu.idtr.base + NO * sizeof(GateDesc);
   uint32_t lx_high = vaddr_read(idt_addr + sizeof(GateDesc) - 2, 2);
   uint32_t lx_low = vaddr_read(idt_addr, 2);
-  uint32_t target_addr = (lx_high & 0xffff0000) | (lx_low & 0xffff);
- /* memcpy(&t1, &cpu.eflags, sizeof(cpu.eflags));
+  uint32_t target_addr = (lx_high & 0xffff0000) | (lx_low & 0xffff);*/
+  memcpy(&t1, &cpu.eflags, sizeof(cpu.eflags));
   rtl_li(&t0, t1);
   rtl_push(&t0);
   rtl_push(&cpu.cs);
@@ -30,7 +30,7 @@ void raise_intr(uint8_t NO, vaddr_t ret_addr) {
 
   uint32_t off_15_0 = vaddr_read(gate_addr, 2);
   uint32_t off_32_16 = vaddr_read(gate_addr + sizeof(GateDesc) - 2, 2);
-  uint32_t target_addr = (off_32_16 << 16) + off_15_0;*/
+  uint32_t target_addr = (off_32_16 << 16) + off_15_0;
 #ifdef DEBUG
   Log("target_addr=0x%x", target_addr);
 #endif
