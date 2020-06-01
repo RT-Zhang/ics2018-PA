@@ -60,3 +60,4 @@ make_EHelper(int);
 make_EHelper(popa);
 make_EHelper(pusha);
 make_EHelper(iret);
+make_EHelper(cwtl);
