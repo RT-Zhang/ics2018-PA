@@ -53,12 +53,12 @@ void set_open_offset(int fd, off_t n) {
 extern void ramdisk_read(void* buf, off_t offset, size_t len);
 extern void ramdisk_write(void* buf, off_t offset, size_t len);
 
-int fs_open(const char* fileName, int flags, int mode) {
+int fs_open(const char* filename, int flags, int mode) {
     for (int i = 0; i < NR_FILES; i++) {
-        if (strcmp(fileName, file_table[i].name) == 0)
+        if (strcmp(filename, file_table[i].name) == 0)
             return i;
     }
-    panic("fileName not exist in file_table\n");
+    panic("filename not exist in file_table\n");
     return -1;
 }
 
@@ -77,7 +77,39 @@ ssize_t fs_read(int fd, void* buf, size_t len) {
     return n;
 }
 
+ssize_t fs_write(int fd, void* buf, size_t len) {
+    assert(fd >= 0 && fd < NR_FILES);
+    if (fd < 3) {
+        Log("arg invalid: fd < 3\n");
+        return 0;
+    }
+    int n = fs_filesz(fd) - get_open_offset(fd);
+    if (n > len) {
+        n = len;
+    }
+    ramdisk_write(buf, disk_offset(fd) + get_open_offset(fd), n);
+    set_open_offset(fd, get_open_offset(fd) + n);
+    return n;
+}
+
 int fs_close(int fd) {
     assert(fd >= 0 && fd < NR_FILES);
     return 0;
+}
+
+off_t fs_lseek(int fd, off_t offset, int whence) {
+    switch(whence) {
+    case SEEK_SET:
+        set_open_offset(fd, offset);
+        return get_open_offset(fd);
+    case SEEK_CUR:
+        set_open_offset(fd, get_open_offset(fd) + offset);
+        return get_open_offset(fd);
+    case SEEK_END:
+        set_open_offset(fd, fs_filesz(fd) + offset);
+        return get_open_offset(fd);
+    default:
+        panic("Unhandled whence ID = %d", whence);
+        return -1;
+    }
 }
