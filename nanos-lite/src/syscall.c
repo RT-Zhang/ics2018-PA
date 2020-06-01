@@ -5,11 +5,8 @@ int sys_none() {
     return 1;
 }
 
-int sys_exit(uintptr_t ah) {
-#ifdef DEBUG
-    printf("In sys_exit, exit code=%d\n", ah);
-#endif
-    return 1;
+void sys_exit(int a) {
+    _halt(a);
 }
 
 _RegSet* do_syscall(_RegSet *r) {
