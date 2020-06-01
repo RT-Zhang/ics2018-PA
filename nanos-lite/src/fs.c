@@ -94,8 +94,8 @@ void fb_write(const void *buf, off_t offset, size_t len);
 ssize_t fs_write(int fd, void* buf, size_t len) {
     assert(fd >= 0 && fd < NR_FILES);
 
-    if (fd < 3 || fd == FD_FB) {
-        Log("arg invalid: fd < 3 || fd == FD_FB\n");
+    if (fd < 3 || fd == FD_DISPINFO) {
+        Log("arg invalid: fd < 3 || fd == FD_DISPINFO\n");
         return 0;
     }
 
