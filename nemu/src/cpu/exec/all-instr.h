@@ -34,6 +34,7 @@ make_EHelper(imul3);
 make_EHelper(div);
 make_EHelper(idiv);
 
+// logic.c
 make_EHelper(not);
 make_EHelper(and);
 make_EHelper(or);
@@ -44,6 +45,7 @@ make_EHelper(shr);
 make_EHelper(sar);
 make_EHelper(setcc);
 make_EHelper(test);
+make_EHelper(rol);
 
 make_EHelper(jmp);
 make_EHelper(jmp_rm);
