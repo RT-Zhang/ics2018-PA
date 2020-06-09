@@ -68,8 +68,15 @@ paddr_t page_translate(vaddr_t addr, bool is_write) {
 
 uint32_t vaddr_read(vaddr_t addr, int len) {
   if (PTE_ADDR(addr) != PTE_ADDR(addr + len - 1)) {
-    printf("error! the data pass two pages: addr=0x%x, len=%d\n", addr, len);
-    assert(0);
+    int page1 = 0x1000 - OFF(addr);
+    int page2 = len - page1;
+    paddr_t paddr1 = page_translate(addr, false);
+    paddr_t paddr2 = page_translate(addr + page1, false);
+
+    uint32_t low = paddr_read(paddr1, page1);
+    uint32_t high = paddr_read(paddr2, page2);
+    uint32_t res = high << (page1 * 8) | low;
+    return res;
   } else {
     paddr_t paddr = page_translate(addr, false);
     return paddr_read(paddr, len);
