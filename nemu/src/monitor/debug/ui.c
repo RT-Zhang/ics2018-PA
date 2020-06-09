@@ -67,13 +67,20 @@ static int cmd_info(char *args) {
     }
     if (s == 'r') {
         int i;
+        // 32 bit registers
         for (i = 0; i < 8; i++) 
             printf("%s 0x%x\n", regsl[i], reg_l(i));        
         printf("eip 0x%x\n", cpu.eip);
+        // 16 bit registers
         for (i = 0; i < 8; i++)
             printf("%s 0x%x\n", regsw[i], reg_w(i));
+        // 8 bit registers
         for (i = 0; i < 8; i++) 
             printf("%s 0x%x\n", regsb[i], reg_b(i));
+        // eflags
+        printf("eflags: CF=%d, ZF=%d, SF=%d, IF=%d, OF=%d\n", cpu.eflags.CF, cpu.eflags.ZF, cpu.eflags.SF, cpu.eflags.IF, cpu.eflags.OF);
+        // Control Register
+        printf("CR0=0x%x, CR3=0x%x", cpu.CR0, cpu.CR3);
         return 0;
     }
     if (s == 'w') {

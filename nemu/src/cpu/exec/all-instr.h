@@ -19,6 +19,7 @@ make_EHelper(leave);
 make_EHelper(cltd);
 make_EHelper(movsx);
 make_EHelper(movzx);
+make_EHelper(mov_store_cr);
 
 make_EHelper(add);
 make_EHelper(inc);
