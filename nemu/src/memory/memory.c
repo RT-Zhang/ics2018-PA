@@ -60,7 +60,7 @@ paddr_t page_translate(vaddr_t addr, bool is_write) {
     
     // physical address
     paddr_t paddr = PTE_ADDR(pte.val) | OFF(addr);
-    printf("va=0x%x, pa=0x%x\n", addr, paddr);
+    //printf("va=0x%x, pa=0x%x\n", addr, paddr);
     return paddr;
   }
   return addr;
