@@ -80,7 +80,7 @@ static int cmd_info(char *args) {
         // eflags
         printf("eflags: CF=%d, ZF=%d, SF=%d, IF=%d, OF=%d\n", cpu.eflags.CF, cpu.eflags.ZF, cpu.eflags.SF, cpu.eflags.IF, cpu.eflags.OF);
         // Control Register
-        printf("CR0=0x%x, CR3=0x%x", cpu.CR0, cpu.CR3);
+        printf("CR0=0x%x, CR3=0x%x\n", cpu.CR0, cpu.CR3);
         return 0;
     }
     if (s == 'w') {
