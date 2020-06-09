@@ -1,5 +1,6 @@
 #include "nemu.h"
 #include "device/mmio.h"
+#include "memory/mmu.h"
 
 #define PMEM_SIZE (128 * 1024 * 1024)
 
@@ -7,6 +8,14 @@
     Assert(addr < PMEM_SIZE, "physical address(0x%08x) is out of bound", addr); \
     guest_to_host(addr); \
     })
+
+// address in page table or page directory entry
+#define PTE_ADDR(pte) ((uint32_t)(pte) & ~0xfff)
+
+// resolve virtual address
+#define PDX(va)     (((uint32_t)(va) >> 22) & 0x3ff)
+#define PTX(va)     (((uint32_t)(va) >> 12) & 0x3ff)
+#define OFF(va)     ((uint32_t)(va) & 0xfff)
 
 uint8_t pmem[PMEM_SIZE];
 
@@ -28,60 +37,51 @@ void paddr_write(paddr_t addr, int len, uint32_t data) {
       mmio_write(addr, len, data, r);
 }
 
-/*paddr_t page_translate(vaddr_t addr, bool is_write) {
-  PDE pde, *pgdir;
-  PTE pte, *pgtable;
-  paddr_t paddr = addr;
-  if (cpu.cr0.protect_enable && cpu.cr0.paging) {
-    pgdir = (PDE*)(intprt_t)(cpu.cr3.page_directory_base << 12);
-    pde.val = paddr_read((intptr_t)&pgdir[(addr >> 22) & 0x3ff], 4);
-    assert(pde.present);
-    pde.accessed = 1;
+paddr_t page_translate(vaddr_t addr, bool is_write) {
+  CR0 cr0 = (CR0)cpu.CR0;
+  if (cr0.protect_enable && cr0.paging) {
+    CR3 cr3 = (CR3)cpu.CR3;
 
-    pgtable = (PTE*)(intptr_t)(pde.page_frame << 12);
-    pte.val = paddr_read((intptr_t) & pgtable[(addr >> 12) & 0x3ff], 4);
-    assert(pte.present);
+    // page directory
+    PDE* pgdirs = (PDE*)PTE_ADDR(cr3.val);
+    PDE pde = (PDE)paddr_read((uint32_t)(pgdirs + PDX(addr)), 4);
+    Assert(pde.present, "addr=0x%x", addr);
+
+    // page table
+    PTE* pgtable = (PTE*)PTE_ADDR(pde.val);
+    PTE pte = (PTE)paddr_read((uint32_t)(pgtable + PTX(addr)), 4);
+    Assert(pte.present, "addr=0x%x", addr);
+
+    // set accessed and dirty bit
+    pde.accessed = 1;
     pte.accessed = 1;
-    pte.dirty = is_write ? 1 : dirty;
-    paddr = (pte.page_frame << 12) | (addr & PAGE_MASK);
+    if (is_write)
+      pte.dirty = 1;
+    
+    // physical address
+    paddr_t paddr = PTE_ADDR(pte.val) | OFF(addr);
+    printf("va=0x%x, pa=0x%x\n", addr, paddr);
+    return paddr;
   }
-  return paddr;
+  return addr;
 }
 
-bool is_cross_boundry(vaddr_t addr, int len) {
-  return (((addr + len - 1) & ~PAGE_MASK) != (addr & ~PAGE_MASK)) ? true : false;
-}*/
-
 uint32_t vaddr_read(vaddr_t addr, int len) {
-  /*paddr_t paddr;
-  if (is_cross_boundry(addr, len)) {
-    union {
-      uint8_t bytes[4];
-      uint32_t dword;
-    } data = {0}
-    for (int i = 0; i < len; i++) {
-      paddr = page_translate(addr + i, false);
-      bytes[i] = paddr_read(paddr, 1);
-    }
-    return data.dword;
+  if (PTE_ADDR(addr) != PTE_ADDR(addr + len - 1)) {
+    printf("error! the data pass two pages: addr=0x%x, len=%d\n", addr, len);
+    assert(0);
   } else {
-    paddr = page_translate(addr, false);
+    paddr_t paddr = page_translate(addr, false);
     return paddr_read(paddr, len);
-  }*/
-  return paddr_read(addr, len);
+  }
 }
 
 void vaddr_write(vaddr_t addr, int len, uint32_t data) {
-  // paddr_t paddr;
-  // if (is_cross_boundry(addr, len)) {
-  //   for (int i = 0; i < len; i++) {
-  //     paddr = page_translate(addr + i, true);
-  //     paddr_write(paddr, 1, data);
-  //     data >>= 8;
-  //   }
-  // } else {
-  //   paddr = page_translate(addr, true);
-  //   return paddr_write(paddr, len);
-  // }
-  paddr_write(addr, len, data);
+  if (PTE_ADDR(addr) != PTE_ADDR(addr + len - 1)) {
+    printf("error! the data pass two pages: addr=0x%x, len=%d\n", addr, len);
+    assert(0);
+  } else {
+    paddr_t paddr = page_translate(addr, true);
+    paddr_write(paddr, len, data);
+  }
 }
