@@ -21,6 +21,12 @@ size_t events_read(void *buf, size_t len) {
   else
       sprintf(str, "t %d\n", _uptime());
 
+  if (down && key == _KEY_F12) {
+    extern void switch_current_game();
+    switch_current_game();
+    Log("key down: _KEY_F12, switch current game");
+  }
+
   if (strlen(str) <= len) {
       strncpy((char*)buf, str, strlen(str));
       return strlen(str);
