@@ -35,5 +35,7 @@ int main() {
   extern void load_prog(const char* filename);
   load_prog("/bin/hello");
 
+  _trap();
+
   panic("Should not reach here");
 }
