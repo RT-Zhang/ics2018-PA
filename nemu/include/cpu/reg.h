@@ -56,6 +56,8 @@ typedef struct {
   uint32_t CR0;
   // Control Register 3 (physical address of page directory)
   uint32_t CR3;
+  // INTR
+  bool INTR;
 } CPU_state;
 
 extern CPU_state cpu;
